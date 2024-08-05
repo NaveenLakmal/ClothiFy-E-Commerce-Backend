@@ -7,7 +7,7 @@ import { UpdateCollectionDto } from './dto/update-collection.dto';
 export class CollectionController {
   constructor(private readonly collectionService: CollectionService) {}
 
-  @Post()
+  @Post('add')
   create(@Body() createCollectionDto: CreateCollectionDto) {
     return this.collectionService.create(createCollectionDto);
   }
