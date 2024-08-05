@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 import { UpdateCollectionDto } from './dto/update-collection.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,13 +8,31 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class CollectionService {
 
-    constructor(
-      @InjectRepository(Collection) private readonly collectionRepository:Repository<Collection>,
-    ){}
+  constructor(
+    @InjectRepository(Collection) private readonly collectionRepository: Repository<Collection>,
+  ) { }
 
   create(createCollectionDto: CreateCollectionDto) {
-    const  collectionEntity= this.collectionRepository.create(createCollectionDto);
-    return this.collectionRepository.save(collectionEntity);
+    try {
+
+      const collectionEntity = this.collectionRepository.create(createCollectionDto);
+      return this.collectionRepository.save(collectionEntity);
+
+    } catch (error) {
+      if (error instanceof InternalServerErrorException) {
+        console.error('InternalServerErrorException:', error.message);
+        throw error;
+
+      } else if (error instanceof BadRequestException) {
+        console.error('BadRequestException:', error);
+        throw error;
+      } else {
+        console.error('An error occurred:', error);
+        throw error;
+
+      }
+
+    }
   }
 
   findAll() {
