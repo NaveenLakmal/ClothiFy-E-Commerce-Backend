@@ -13,6 +13,7 @@ export class CollectionService {
   ) { }
 
   create(createCollectionDto: CreateCollectionDto) {
+
     try {
 
       const collectionEntity = this.collectionRepository.create(createCollectionDto);
@@ -35,8 +36,26 @@ export class CollectionService {
     }
   }
 
-  findAll() {
-    return `This action returns all collection`;
+  async findAll() {
+    try {
+      
+      return await this.collectionRepository.find();
+
+    } catch (error) {
+      if (error instanceof InternalServerErrorException) {
+        console.error('InternalServerErrorException:', error.message);
+        throw error;
+
+      } else if (error instanceof BadRequestException) {
+        console.error('BadRequestException:', error);
+        throw error;
+      } else {
+        const sanitizedError = new Error('An unexpected error occurred');
+        console.error('An error occurred:', error);
+        throw sanitizedError;
+
+      }
+    }
   }
 
   findOne(id: number) {

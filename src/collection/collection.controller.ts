@@ -12,7 +12,7 @@ export class CollectionController {
     return this.collectionService.create(createCollectionDto);
   }
 
-  @Get()
+  @Get('get-all')
   findAll() {
     return this.collectionService.findAll();
   }
