@@ -22,7 +22,7 @@ export class CollectionController {
     return this.collectionService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Patch('update/:id')
   update(@Param('id') id: string, @Body() updateCollectionDto: UpdateCollectionDto) {
     return this.collectionService.update(+id, updateCollectionDto);
   }

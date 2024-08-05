@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 import { UpdateCollectionDto } from './dto/update-collection.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -38,7 +38,7 @@ export class CollectionService {
 
   async findAll() {
     try {
-      
+
       return await this.collectionRepository.find();
 
     } catch (error) {
@@ -62,8 +62,42 @@ export class CollectionService {
     return `This action returns a #${id} collection`;
   }
 
-  update(id: number, updateCollectionDto: UpdateCollectionDto) {
-    return `This action updates a #${id} collection`;
+  async update(id: number, updateCollectionDto: UpdateCollectionDto) {
+    try {
+      const collection = await this.collectionRepository.findOne({
+        where: {
+          id: id
+        }
+      })
+
+      if (!collection) {
+        throw new NotFoundException(`collection with  ID ${id} not found`);
+      }
+
+      Object.assign(collection, updateCollectionDto);
+      return await this.collectionRepository.save(collection);
+
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        console.error('NotFoundException', error);
+        throw error;
+
+      } else if (error instanceof InternalServerErrorException) {
+        console.error('BadRequestException:', error);
+        throw error;
+
+      } else if (error instanceof BadRequestException) {
+        console.error('InternalServerErrorException:', error.message);
+        throw error;
+
+      } else {
+        const sanitizedError = new Error('An unexpected error occurred');
+        console.error('An error occurred:', error);
+        throw sanitizedError;
+
+      }
+    }
+
   }
 
   remove(id: number) {
