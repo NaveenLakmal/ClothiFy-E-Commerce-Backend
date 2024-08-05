@@ -10,7 +10,7 @@ export class Collection {
     @Column()
     name: string;
 
-    @OneToMany(() => Product, (product) => product.collection)
+    @OneToMany(() => Product, product => product.collection)
     products:Product[];
 
 }
